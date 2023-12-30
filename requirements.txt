@@ -3,4 +3,4 @@ Django==4.2.7
 django-crispy-forms
 python-decouple
 mysqlclient
-
+Pillow
