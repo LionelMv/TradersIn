@@ -2,3 +2,4 @@ Django
 python-decouple
 Pillow
 djangorestframework
+mysql-connector-python
