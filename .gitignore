@@ -1,0 +1,3 @@
+.venv
+TradersIn/__pycache__
+db.sqlite3
