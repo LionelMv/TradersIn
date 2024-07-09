@@ -2,3 +2,5 @@
 TradersIn/__pycache__
 db.sqlite3
 .env
+blog/__pycache__
+blog/migrations/__pycache__
