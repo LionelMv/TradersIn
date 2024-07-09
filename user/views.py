@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import SignUpForm
 from functools import wraps
@@ -46,3 +47,31 @@ def register_user(request):
         "form": form
     }
     return render(request, "user/register.html", context)
+
+
+@redirect_authenticated_user
+def login_user(request):
+    """Login user page."""
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, "You are now logged in")
+            return redirect("blog:home")
+        else:
+            messages.info(request, "Error logging in. Try Again...")
+            return redirect("users:login")
+    context = {
+        "title": "Login"
+    }
+    return render(request, "user/login.html", context)
+
+
+@login_required
+def logout_user(request):
+    """Logout user page."""
+    logout(request)
+    messages.success(request, "You are now logged out")
+    return redirect("blog:home")
