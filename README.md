@@ -1,7 +1,7 @@
 # TradersIn
 
 ## About
-This is a blog post for traders where they can share their knowledge and expertise and also get to interact with one another in the platform.
+This is a blog web application for traders where they can share their knowledge and expertise and also get to interact with one another in the platform.
 
 ## Requirements
 
