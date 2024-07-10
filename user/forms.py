@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from .models import Profile
 
 
 class BaseForm(forms.ModelForm):
@@ -14,6 +15,7 @@ class BaseForm(forms.ModelForm):
             if isinstance(field, forms.EmailField):
                 field.widget.attrs['placeholder'] = 'E-mail Address'
 
+
 class SignUpForm(BaseForm, UserCreationForm):
     """Form for creating new users with additional styling"""
     email = forms.EmailField(label="Email")
@@ -22,8 +24,29 @@ class SignUpForm(BaseForm, UserCreationForm):
 
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "email", "password1", "password2"]
+        fields = ["username", "first_name", "last_name",
+                  "email", "password1", "password2"]
 
     def __init__(self, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
         # Additional customization if needed
+
+
+class UserUpdateForm(BaseForm):
+    """Form to update user details with consistent styling"""
+    email = forms.EmailField(label="Email")
+    first_name = forms.CharField(label="First Name", max_length=100)
+    last_name = forms.CharField(label="Last Name", max_length=100)
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email"]
+
+
+class ProfilePictureForm(forms.ModelForm):
+    """Form to update profile image"""
+    image = forms.ImageField(label="Profile Picture", required=False)
+
+    class Meta:
+        model = Profile
+        fields = ["image"]
