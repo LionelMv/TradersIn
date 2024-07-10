@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import SignUpForm
 from functools import wraps
+from .models import Profile
+from blog.models import Post
 
 
 def redirect_authenticated_user(view_func):
@@ -75,3 +77,16 @@ def logout_user(request):
     logout(request)
     messages.success(request, "You are now logged out")
     return redirect("blog:home")
+
+
+@login_required
+def profile(request, pk):
+    profile = Profile.objects.get(user_id=pk)
+    posts = Post.objects.filter(author_id=pk).order_by("-date_posted")
+
+    context = {
+        "title": "Profile",
+        "profile": profile,
+        "posts": posts
+    }
+    return render(request, "user/profile.html", context)
