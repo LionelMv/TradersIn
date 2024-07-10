@@ -16,7 +16,7 @@
             </div>
         </div>
     </div>
-    <a href="#" class="btn btn-outline-primary">Update Profile</a>
+    <a href="{% url 'user:update_user' %}" class="btn btn-outline-primary">Update Profile</a>
     <br><br>
     {% if posts %}
         {% for post in posts %}
