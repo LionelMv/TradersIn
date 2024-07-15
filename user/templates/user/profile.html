@@ -19,6 +19,7 @@
     <a href="{% url 'user:update_user' %}" class="btn btn-outline-primary">Update Profile</a>
     <br><br>
     {% if posts %}
+        <h2>Posts</h2>
         {% for post in posts %}
             <!-- User posts-->
             <div class="card mb-4 shadow p-3 mb-5 bg-body-tertiary rounded" style="max-width: 540px;">
