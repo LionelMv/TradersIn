@@ -64,7 +64,7 @@ def login_user(request):
             return redirect("blog:home")
         else:
             messages.info(request, "Error logging in. Try Again...")
-            return redirect("users:login")
+            return redirect("user:login")
     context = {
         "title": "Login"
     }
