@@ -1,4 +1,5 @@
 {% extends "blog/base.html" %}
+{% load custom_filters %}
 {% block content %}
         <div class="container mt-5">
             <div class="row">
@@ -12,7 +13,14 @@
                             <a class="mr-2" href="{% url 'user:profile' post.author.id %}">{{ post.author }}</a>
                             <div class="small text-muted">{{ post.date_posted|date:"F d, Y H:i" }}</div>
                             <h2 class="card-title"><a class="text-reset" href="{% url 'blog:post_detail' post.id %}">{{ post.title }}</a></h2>
-                            <p class="card-text">{{ post.content }}</p>
+                            <p class="card-text">
+                                {% if post.content|wordcount > 20 %}
+                                    {{ post.content|truncate_words:20 }}...
+                                    <a href="{% url 'blog:post_detail' post.id %}">See more</a>
+                                {% else %}
+                                    {{ post.content }}
+                                {% endif %}
+                            </p>
                             <!--a class="btn btn-primary" href="#!">Read more →</a-->
                         </div>
                     </div>
