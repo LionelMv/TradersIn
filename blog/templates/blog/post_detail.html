@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+{% block content %}
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Blog post-->
+                    <div class="card mb-4 shadow p-3 mb-5 bg-body-tertiary rounded">
+                        <!--a href="#!"><img class="card-img-top" src="https://dummyimage.com/850x350/dee2e6/6c757d.jpg" alt="..." /></a-->
+                        <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+                        <div class="card-body">
+                            <a class="mr-2" href="{% url 'user:profile' post.author.id %}">{{ object.author }}</a>
+                            <div class="small text-muted">{{ object.date_posted|date:"F d, Y H:i" }}</div>
+                            <h2 class="card-title">{{ object.title }}</h2>
+                            <p class="card-text">{{ object.content }}</p>
+                            <!--a class="btn btn-primary" href="#!">Read more →</a-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock content %}
