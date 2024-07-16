@@ -8,3 +8,4 @@ blog/templatetags/__pycache__
 user/__pycache__
 user/migrations/__pycache__
 media/profile_pics
+lorem.html
