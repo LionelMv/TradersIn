@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.urls import reverse
 
 class Post(models.Model):
     """Creates the post fields.
@@ -14,3 +14,8 @@ class Post(models.Model):
         """String representation of the class Post.
         """
         return self.title
+
+    def get_absolute_url(self):
+        """Returns the absolute url of the post.
+        """
+        return reverse('blog:post_detail', kwargs={'pk': self.pk})
