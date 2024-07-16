@@ -1,6 +1,10 @@
 from django.shortcuts import render
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView
+)
 from .models import Post
 
 
@@ -14,6 +18,7 @@ from .models import Post
 
 
 class PostListView(ListView):
+    """Home page view."""
     model = Post
     template_name = "blog/home.html"
     context_object_name = "posts"
@@ -22,4 +27,16 @@ class PostListView(ListView):
 
 
 class PostDetailView(DetailView):
+    """Post detail view."""
     model = Post
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    """Post create view."""
+    model = Post
+    fields = ["title", "content"]
+
+    def form_valid(self, form):
+        """Override form_valid method."""
+        form.instance.author = self.request.user
+        return super().form_valid(form)
