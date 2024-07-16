@@ -4,7 +4,8 @@ from django.views.generic import (
     ListView,
     DetailView,
     CreateView,
-    UpdateView
+    UpdateView,
+    DeleteView
 )
 from .models import Post
 
@@ -52,6 +53,19 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         """Override form_valid method."""
         form.instance.author = self.request.user
         return super().form_valid(form)
+
+    def test_func(self):
+        """Override test_func method."""
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
+
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Post delete view."""
+    model = Post
+    success_url = "/"
 
     def test_func(self):
         """Override test_func method."""
