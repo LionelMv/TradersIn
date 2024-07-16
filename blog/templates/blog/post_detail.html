@@ -6,7 +6,20 @@
                     <!-- Blog post-->
                     <div class="card mb-4 shadow p-3 mb-5 bg-body-tertiary rounded">
                         <!--a href="#!"><img class="card-img-top" src="https://dummyimage.com/850x350/dee2e6/6c757d.jpg" alt="..." /></a-->
-                        <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+                        <div class="d-flex">
+                            <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+                            {% if object.author == user %}
+                                <div class="dropdown dropstart ms-auto">
+                                    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        &#x2022;&#x2022;&#x2022; <!-- This represents the three dots --> 
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-dark">
+                                        <li><a class="dropdown-item" href="{% url 'blog:post_update' post.id %}">Update</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'blog:post_delete' post.id %}">Delete</a></li>
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
                         <div class="card-body">
                             <a class="mr-2" href="{% url 'user:profile' post.author.id %}">{{ object.author }}</a>
                             <div class="small text-muted">{{ object.date_posted|date:"F d, Y H:i" }}</div>
