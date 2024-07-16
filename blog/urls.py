@@ -10,5 +10,5 @@ app_name = "blog"
 urlpatterns = [
     path("", PostListView.as_view(), name="home"),
     path("post/<int:pk>/", PostDetailView.as_view(), name="post_detail"),
-    path("post/new/", PostCreateView.as_view(), name="post_new"),
+    path("post/new/", PostCreateView.as_view(), name="post_create"),
 ]
