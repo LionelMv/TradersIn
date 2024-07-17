@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -81,7 +81,7 @@ def logout_user(request):
 
 @login_required
 def profile(request, pk):
-    profile = Profile.objects.get(user_id=pk)
+    profile = get_object_or_404(Profile, user_id=pk)
     posts = Post.objects.filter(author_id=pk).order_by("-date_posted")
 
     context = {
