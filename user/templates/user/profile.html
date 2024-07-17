@@ -1,4 +1,5 @@
 {% extends "blog/base.html" %}
+{% load custom_filters %}
 {% block content %}
     <br><br>
     <div class="container">
@@ -43,7 +44,14 @@
                             <div class="card-body">
                                 <div class="small text-muted">{{ post.date_posted|date:"F d, Y H:i" }}</div>
                                 <h2 class="card-title">{{ post.title }}</h2>
-                                <p class="card-text">{{ post.content }}</p>
+                                <p class="card-text">
+                                    {% if post.content|wordcount > 20 %}
+                                        {{ post.content|truncate_words:20 }}...
+                                        <a href="{% url 'blog:post_detail' post.id %}">See more</a>
+                                    {% else %}
+                                        {{ post.content }}
+                                    {% endif %}
+                                </p>
                             </div>
                         </div>
                     {% endfor %}
