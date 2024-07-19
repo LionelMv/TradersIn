@@ -81,8 +81,24 @@ def logout_user(request):
 
 @login_required
 def profile(request, pk):
+    """User profile page."""
     profile = get_object_or_404(Profile, user_id=pk)
     posts = Post.objects.filter(author_id=pk).order_by("-date_posted")
+
+    if request.method == "POST":
+        # Get current user
+        current_user_profile = request.user.profile
+        # Check if user follow/unfollow
+        action = request.POST["follow"] 
+        # Add or remove follow
+        if action == "unfollow":
+            current_user_profile.follows.remove(profile)
+        else:
+            current_user_profile.follows.add(profile)
+        # Save profile
+        current_user_profile.save()
+        # Redirect to profile
+        return redirect("user:profile", pk=profile.user.id)
 
     context = {
         "title": "Profile",
