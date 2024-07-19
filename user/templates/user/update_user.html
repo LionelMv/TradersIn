@@ -1,13 +1,12 @@
 {% extends "blog/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="col-md-6 offset-md-3">
+    <div class="col-md-6 offset-md-3 my-5">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            </br></br>
             <legend class="border-bottom mb-4">Update Your Account</legend>
             {{ user_form|crispy }}
-            {{ pic_form|crispy }}
+            {{ p_form|crispy }}
             <button type="submit" class="btn btn-primary">Update</button>
         </form>
     </div>
