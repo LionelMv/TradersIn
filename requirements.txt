@@ -3,3 +3,4 @@ python-decouple
 Pillow
 djangorestframework
 mysql-connector-python
+crispy-bootstrap5
