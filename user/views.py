@@ -108,7 +108,7 @@ def profile(request, pk):
     return render(request, "user/profile.html", context)
 
 
-@login_required(login_url="users:login")
+@login_required
 def update_user(request):
     """Update user profile page."""
     if request.method == "POST":
