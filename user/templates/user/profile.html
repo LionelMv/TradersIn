@@ -14,7 +14,20 @@
                         <h6 class="card-subtitle mb-2 text-body-secondary">@{{ profile.user.username|lower }}</h6>
                         <p class="card-text">{{ profile.user.profile.bio }}</p>
                         <br>
-                        <a href="{% url 'user:update_user' %}" class="btn btn-outline-primary">Update Profile</a>
+                        {% if profile.user == request.user %}
+                            <a href="{% url 'user:update_user' %}" class="btn btn-outline-primary">Edit Profile</a>
+                        {% endif %}
+                        <br><br>
+                        {% if profile.user != request.user %}
+                            <form method="post" action="{% url 'user:profile' profile.user.id %}">
+                                {% csrf_token %}
+                                {% if profile in user.profile.follows.all %}
+                                <button class="btn btn-outline-danger" name="follow" value="unfollow" type="submit">UnFollow</button>
+                                {% else %}
+                                    <button class="btn btn-outline-success" name="follow" value="follow" type="submit">Follow</button>
+                                {%  endif%}
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
