@@ -24,7 +24,7 @@
                             <a class="mr-2" href="{% url 'user:profile' post.author.id %}">{{ object.author }}</a>
                             <div class="small text-muted">{{ object.date_posted|date:"F d, Y H:i" }}</div>
                             <h2 class="card-title">{{ object.title }}</h2>
-                            <p class="card-text">{{ object.content }}</p>
+                            <p class="card-text">{{ object.content|linebreaks|urlize }}</p>
                             <!--a class="btn btn-primary" href="#!">Read more →</a-->
                         </div>
                     </div>
