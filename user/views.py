@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import SignUpForm, UserUpdateForm, ProfilePictureForm
+from .forms import SignUpForm, UserUpdateForm, ProfileUpdateForm
 from functools import wraps
 from .models import Profile
 from blog.models import Post
@@ -119,26 +119,26 @@ def update_user(request):
             request.POST,
             instance=request.user
             )
-        pic_form = ProfilePictureForm(
+        p_form = ProfileUpdateForm(
             request.POST,
             request.FILES,
             instance=request.user.profile
             )
-        if user_form.is_valid() and pic_form.is_valid():
+        if user_form.is_valid() and p_form.is_valid():
             user_form.save()
-            pic_form.save()
+            p_form.save()
             # login(request, request.user)
             messages.success(request, "Your account has been updated!")
             return redirect("user:profile", pk=request.user.id)
 
     else:
         user_form = UserUpdateForm(instance=request.user)
-        pic_form = ProfilePictureForm(instance=request.user.profile)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
 
     context = {
         "title": "Update Profile",
         "user_form": user_form,
-        "pic_form": pic_form
+        "p_form": p_form
     }
 
     return render(request, "user/update_user.html", context)
