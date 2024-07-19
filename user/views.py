@@ -61,7 +61,10 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request, "You are now logged in")
-            return redirect("blog:home")
+            # Get the 'next' parameter or default to 'blog:home'
+            next_url = request.GET.get('next', 'blog:home')
+            # Redirect to the next URL
+            return redirect(next_url)
         else:
             messages.info(request, "Error logging in. Try Again...")
             return redirect("user:login")
@@ -89,7 +92,7 @@ def profile(request, pk):
         # Get current user
         current_user_profile = request.user.profile
         # Check if user follow/unfollow
-        action = request.POST["follow"] 
+        action = request.POST["follow"]
         # Add or remove follow
         if action == "unfollow":
             current_user_profile.follows.remove(profile)
