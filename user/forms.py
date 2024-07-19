@@ -29,11 +29,12 @@ class UserUpdateForm(forms.ModelForm):
         fields = ["username", "first_name", "last_name", "email"]
 
 
-class ProfilePictureForm(forms.ModelForm):
-    """Form to update profile picture"""
+class ProfileUpdateForm(forms.ModelForm):
+    """Form to update profile picture and bio"""
+    bio = forms.CharField(label="Bio", required=False, widget=forms.Textarea)
     image = forms.ImageField(label="Profile Picture", required=False)
 
     class Meta:
         """Form metadata"""
         model = Profile
-        fields = ["image"]
+        fields = ["bio", "image"]
