@@ -21,7 +21,18 @@
                                     {{ post.content }}
                                 {% endif %}
                             </p>
-                            <!--a class="btn btn-primary" href="#!">Read more →</a-->
+                            <div>
+                                {{ post.likes.count }} Likes - 
+                                {% if user in post.likes.all %}
+                                    <a href="{% url 'blog:post_like' post.id %}">
+                                        <i class="fa-solid fa-heart" style="color: red;"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'blog:post_like' post.id %}">
+                                        <i class="fa fa-heart-o" style="color: red;"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
