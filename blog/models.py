@@ -9,6 +9,12 @@ class Post(models.Model):
     content = models.TextField()
     date_posted = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    likes = models.ManyToManyField(User, related_name='post_like', blank=True)
+
+    def total_likes(self):
+        """Returns the total likes of the post.
+        """
+        return self.likes.count()
 
     def __str__(self) -> str:
         """String representation of the class Post.
