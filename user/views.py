@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import SignUpForm, UserUpdateForm, ProfileUpdateForm
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 from functools import wraps
+from .forms import SignUpForm, UserUpdateForm, ProfileUpdateForm
 from .models import Profile
 from blog.models import Post
 
@@ -13,8 +15,7 @@ def redirect_authenticated_user(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if request.user.is_authenticated:
-            messages.success(request,
-                             "Logout current user to access this page!")
+            messages.info(request, "You are already logged in.")
             return redirect("blog:home")
         return view_func(request, *args, **kwargs)
     return _wrapped_view
@@ -26,20 +27,10 @@ def register_user(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
-            # clean data
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password1']
-            # Login user
-            user = authenticate(username=username, password=password)
+            user = form.save()
             login(request, user)
-
-            # create profile for user
-            # profile = Profile.objects.create(user=user)
             messages.success(request,
-                             f"Your account has been created. \
-                             Welcome!.")
-            # redirect to home page after registration
+                             "Your account has been created. Welcome!")
             return redirect("blog:home")
     else:
         form = SignUpForm()
@@ -61,59 +52,65 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request, "You are now logged in")
-            # Get the 'next' parameter or default to 'blog:home'
             next_url = request.GET.get('next', 'blog:home')
-            # Redirect to the next URL
             return redirect(next_url)
         else:
-            messages.info(request, "Error logging in. Try Again...")
-            return redirect("user:login")
-    context = {
-        "title": "Login"
-    }
-    return render(request, "user/login.html", context)
+            messages.error(request,
+                           "Invalid username or password. Please try again.")
+    return render(request, "user/login.html", {"title": "Login"})
 
 
 @login_required
 def logout_user(request):
     """Logout user page."""
     logout(request)
-    messages.success(request, "You are now logged out")
+    messages.success(request, "You have been logged out successfully")
     return redirect("blog:home")
 
 
 @login_required
+@ensure_csrf_cookie
 def profile(request, pk):
-    """User profile page."""
+    """Profile page."""
     profile = get_object_or_404(Profile, user_id=pk)
-    posts = Post.objects.filter(author_id=pk).order_by("-date_posted")
 
     if request.method == "POST":
-        # Get current user
         current_user_profile = request.user.profile
-        # Check if user follow/unfollow
-        action = request.POST["follow"]
-        # Add or remove follow
-        if action == "unfollow":
-            current_user_profile.follows.remove(profile)
-        else:
-            current_user_profile.follows.add(profile)
-        # Save profile
-        current_user_profile.save()
-        # Redirect to profile
-        return redirect("user:profile", pk=profile.user.id)
+        action = request.POST.get("follow")
+        target_profile_id = request.POST.get("profile_id", pk)
+        target_profile = get_object_or_404(Profile, user_id=target_profile_id)
 
+        if action == "unfollow":
+            current_user_profile.follows.remove(target_profile)
+            status = "unfollowed"
+        else:
+            current_user_profile.follows.add(target_profile)
+            status = "followed"
+
+        current_user_profile.save()
+
+        return JsonResponse({
+            "status": status,
+            "target_followers_count": target_profile.followed_by.count(),
+            "target_following_count": target_profile.follows.count(),
+            "current_user_followers_count": current_user_profile.followed_by.count(),
+            "current_user_following_count": current_user_profile.follows.count()
+        })
+
+    posts = Post.objects.filter(author_id=pk).order_by("-date_posted")
     context = {
         "title": "Profile",
         "profile": profile,
-        "posts": posts
+        "posts": posts,
+        "followers_count": profile.followed_by.count(),
+        "following_count": profile.follows.count()
     }
     return render(request, "user/profile.html", context)
 
 
 @login_required
 def update_user(request):
-    """Update user profile page."""
+    """Update user profile."""
     if request.method == "POST":
         user_form = UserUpdateForm(
             request.POST,
@@ -127,10 +124,8 @@ def update_user(request):
         if user_form.is_valid() and p_form.is_valid():
             user_form.save()
             p_form.save()
-            # login(request, request.user)
             messages.success(request, "Your account has been updated!")
             return redirect("user:profile", pk=request.user.id)
-
     else:
         user_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
@@ -140,5 +135,4 @@ def update_user(request):
         "user_form": user_form,
         "p_form": p_form
     }
-
     return render(request, "user/update_user.html", context)
