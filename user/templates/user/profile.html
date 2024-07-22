@@ -14,6 +14,20 @@
                     <h6 class="card-subtitle mb-2 text-body-secondary">@{{ profile.user.username|lower }}</h6>
                     <p class="card-text">{{ profile.user.profile.bio }}</p>
                     <br>
+                    {% if profile.twitter_link %}
+                        <a href="{{ profile.twitter_link }}" class="card-link" style="color: black;" target="new"><i class="fa-brands fa-twitter"></i></a>
+                    {% endif %}
+                    {% if profile.instagram_link %}
+                        <a href="{{ profile.instagram_link }}" class="card-link" style="color: black;" target="new"><i class="fa-brands fa-instagram"></i></a>
+                    {% endif %}
+                    {% if profile.linkedin_link %}
+                        <a href="{{ profile.linkedin_link }}" class="card-link" style="color: black;" target="new"><i class="fa-brands fa-linkedin"></i></a>
+                    {% endif %}
+                    {% if profile.telegram_link %}
+                        <a href="{{ profile.telegram_link }}" class="card-link" style="color: black;" targe="new"><i class="fa-brands fa-telegram"></i></a>
+                    {% endif %}
+
+                    <br><br>
                     {% if profile.user == request.user %}
                         <a href="{% url 'user:update_user' %}" class="btn btn-outline-primary">Edit Profile</a>
                     {% endif %}
