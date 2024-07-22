@@ -33,8 +33,12 @@ class ProfileUpdateForm(forms.ModelForm):
     """Form to update profile picture and bio"""
     bio = forms.CharField(label="Bio", required=False, widget=forms.Textarea)
     image = forms.ImageField(label="Profile Picture", required=False)
+    twitter_link = forms.URLField(label="Twitter Link", required=False)
+    instagram_link = forms.URLField(label="Instagram Link", required=False)
+    linkedin_link = forms.URLField(label="LinkedIn Link", required=False)
+    telegram_link = forms.URLField(label="Telegram Link", required=False)
 
     class Meta:
         """Form metadata"""
         model = Profile
-        fields = ["bio", "image"]
+        fields = ["bio", "image", "twitter_link", "instagram_link", "linkedin_link", "telegram_link"]
