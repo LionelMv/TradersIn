@@ -10,6 +10,11 @@ class Profile(models.Model):
                                      related_name='followed_by',
                                      symmetrical=False,
                                      blank=True)
+    
+    twitter_link = models.URLField(max_length=200, blank=True)
+    instagram_link = models.URLField(max_length=200, blank=True)
+    linkedin_link = models.URLField(max_length=200, blank=True)
+    telegram_link = models.URLField(max_length=200, blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
