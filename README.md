@@ -3,24 +3,31 @@
 ## About
 This is a blog web application for traders where they can share their knowledge and expertise and also get to interact with one another in the platform.
 
-## Requirements
+## Installation
 
-### Clone the repository
+### 1. Clone the repository
 ```
 git clone https://github.com/LionelMv/TradersIn.git
 ```
 
-### Create a virtual environment.
+### 2. Create a virtual environment.
 To learn how to create and activate a virtual environment, check this link: [Django - Create Virtual Environment](https://www.w3schools.com/django/django_create_virtual_environment.php)
 
-### Install required packages
-Django, Python-decouple, Pillow.
+### 3. Install required packages
+All these packages are listed in the requirements file:
+- Django
+- Python-decouple
+- Pillow
+- djangorestframework
+- mysql-connector-python
+- crispy-bootstrap5
+
 To learn how to use python-decouple, check this link: [python-decouple](https://pypi.org/project/python-decouple/)
 ```
 pip install requirements.txt
 ```
 
-### Configure your own database.
+### 4. Configure your own database.
 While using SQL lite is sufficient, you can choose to use a different database according to your preference.
 For this project, I have used MySQL.
 You need to install MySQL and configure it to work with this project.
@@ -33,7 +40,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### View the webpage
+### 5. View the webpage
 ```
 cd TradersIn
 python manage.py runserver
