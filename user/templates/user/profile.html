@@ -62,17 +62,17 @@
                                     {{ post.content }}
                                 {% endif %}
                             </p>
-                            <div>
-                                {{ post.likes.count }} Likes - 
+                            <div class="d-flex justify-content-end">                             
                                 {% if user in post.likes.all %}
-                                    <a href="{% url 'blog:post_like' post.id %}">
+                                    <a class="pe-1" href="{% url 'blog:post_like' post.id %}">
                                         <i class="fa-solid fa-heart" style="color: red;"></i>
                                     </a>
                                 {% else %}
-                                    <a href="{% url 'blog:post_like' post.id %}">
+                                    <a class="pe-1" href="{% url 'blog:post_like' post.id %}">
                                         <i class="fa fa-heart-o" style="color: red;"></i>
                                     </a>
                                 {% endif %}
+                                {{ post.likes.count }}
                             </div>
                         </div>
                     </div>
