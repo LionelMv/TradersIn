@@ -1,93 +1,193 @@
 {% extends "blog/base.html" %}
 {% load custom_filters %}
 {% block content %}
-    <br><br>
-    <div class="container">
-        <div class="card mb-3" style="max-width: 540px;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="{{ profile.image.url }}" class="img-fluid rounded-start" alt="...">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ profile.user.username }}</h5>
-                        <h6 class="card-subtitle mb-2 text-body-secondary">@{{ profile.user.username|lower }}</h6>
-                        <p class="card-text">{{ profile.user.profile.bio }}</p>
-                        <br>
-                        {% if profile.user == request.user %}
-                            <a href="{% url 'user:update_user' %}" class="btn btn-outline-primary">Edit Profile</a>
-                        {% endif %}
-                        <br><br>
-                        {% if profile.user != request.user %}
-                            <form method="post" action="{% url 'user:profile' profile.user.id %}">
-                                {% csrf_token %}
-                                {% if profile in user.profile.follows.all %}
-                                <button class="btn btn-outline-danger" name="follow" value="unfollow" type="submit">UnFollow</button>
-                                {% else %}
-                                    <button class="btn btn-outline-success" name="follow" value="follow" type="submit">Follow</button>
-                                {%  endif%}
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
+<br><br>
+<div class="container" data-current-profile-id="{{ profile.user.id }}" data-logged-in-user-id="{{ request.user.id }}">
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{ profile.image.url }}" class="img-fluid rounded-start" alt="...">
             </div>
-        </div>
-        <br><br>
-
-        <!-- Tab section -->
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab" aria-controls="posts" aria-selected="true">Posts</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="followers-tab" data-bs-toggle="tab" data-bs-target="#followers" type="button" role="tab" aria-controls="followers" aria-selected="false">Followers</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="following-tab" data-bs-toggle="tab" data-bs-target="#following" type="button" role="tab" aria-controls="following" aria-selected="false">Following</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
-                <br>
-                {% if posts %}
-                    {% for post in posts %}
-                        <!-- User posts-->
-                        <div class="card mb-4 shadow p-3 mb-5 bg-body-tertiary rounded" style="max-width: 540px;">
-                            <div class="card-body">
-                                <div class="small text-muted">{{ post.date_posted|date:"F d, Y H:i" }}</div>
-                                <h2 class="card-title">{{ post.title }}</h2>
-                                <p class="card-text">
-                                    {% if post.content|wordcount > 20 %}
-                                        {{ post.content|truncate_words:20 }}...
-                                        <a href="{% url 'blog:post_detail' post.id %}">See more</a>
-                                    {% else %}
-                                        {{ post.content }}
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab">
-                <div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">{{ profile.user.username }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">@{{ profile.user.username|lower }}</h6>
+                    <p class="card-text">{{ profile.user.profile.bio }}</p>
                     <br>
-                    {% for follower in profile.followed_by.all %}
-                        <a href="{% url 'user:profile' follower.user.id %}">{{ follower.user.username }}</a>
-                        <br>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="tab-pane fade" id="following" role="tabpanel" aria-labelledby="following-tab">
-                <div>
-                    <br>
-                    {% for following in profile.follows.all %}
-                        <a href="{% url 'user:profile' following.user.id %}">{{ following.user.username }}</a>
-                        <br>
-                    {% endfor %}
+                    {% if profile.user == request.user %}
+                        <a href="{% url 'user:update_user' %}" class="btn btn-outline-primary">Edit Profile</a>
+                    {% endif %}
+                    <br><br>
+                    {% if profile.user != request.user %}
+                        <button class="btn follow-toggle card-follow-btn {% if profile in request.user.profile.follows.all %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
+    data-action="{% if profile in request.user.profile.follows.all %}unfollow{% else %}follow{% endif %}" 
+    data-profile-id="{{ profile.user.id }}">
+                            {% if profile in request.user.profile.follows.all %}Unfollow{% else %}Follow{% endif %}
+                        </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-{% endblock content %}
+    <br><br>
+
+    <!-- Tab section -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab" aria-controls="posts" aria-selected="true">Posts</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="followers-tab" data-bs-toggle="tab" data-bs-target="#followers" type="button" role="tab" aria-controls="followers" aria-selected="false">Followers ({{ followers_count }})</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="following-tab" data-bs-toggle="tab" data-bs-target="#following" type="button" role="tab" aria-controls="following" aria-selected="false">Following ({{ following_count }})</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
+            <br>
+            {% if posts %}
+                {% for post in posts %}
+                    <!-- User posts-->
+                    <div class="card mb-4 shadow p-3 mb-5 bg-body-tertiary rounded" style="max-width: 540px;">
+                        <div class="card-body">
+                            <div class="small text-muted">{{ post.date_posted|date:"F d, Y H:i" }}</div>
+                            <h2 class="card-title">{{ post.title }}</h2>
+                            <p class="card-text">
+                                {% if post.content|wordcount > 20 %}
+                                    {{ post.content|truncate_words:20 }}...
+                                    <a href="{% url 'blog:post_detail' post.id %}">See more</a>
+                                {% else %}
+                                    {{ post.content }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab">
+            <div class="list-group">
+            {% for follower in profile.followed_by.all %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="{% url 'user:profile' follower.user.id %}" class="text-decoration-none text-dark">
+                        <div>
+                            <h5 class="mb-1">{{ follower.user.username }}</h5>
+                            <p class="mb-1 text-muted">{{ follower.bio }}</p>
+                        </div>
+                    </a>
+                    {% if follower.user != request.user %}
+                        <button class="btn btn-sm follow-toggle {% if follower.user.profile in request.user.profile.follows.all %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
+                                data-action="{% if follower.user.profile in request.user.profile.follows.all %}unfollow{% else %}follow{% endif %}" 
+                                data-profile-id="{{ follower.user.id }}">
+                            {% if follower.user.profile in request.user.profile.follows.all %}Unfollow{% else %}Follow{% endif %}
+                        </button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="following" role="tabpanel" aria-labelledby="following-tab">
+            <div class="list-group">
+                {% for following in profile.follows.all %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{% url 'user:profile' following.user.id %}" class="text-decoration-none text-dark">
+                            <div>
+                                <h5 class="mb-1">{{ following.user.username }}</h5>
+                                <p class="mb-1 text-muted">{{ following.bio }}</p>
+                            </div>
+                        </a>
+                        {% if following.user != request.user %}
+                            <button class="btn btn-sm follow-toggle {% if following.user.profile in request.user.profile.follows.all %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
+                           data-action="{% if following.user.profile in request.user.profile.follows.all %}unfollow{% else %}follow{% endif %}" 
+                           data-profile-id="{{ following.user.id }}">
+                                {% if following.user.profile in request.user.profile.follows.all %}Unfollow{% else %}Follow{% endif %}
+                            </button>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        var currentProfileId = $(".container").data("current-profile-id");
+        var loggedInUserId = $(".container").data("logged-in-user-id");
+
+        function updateFollowCounts(followersCount, followingCount) {
+            $("#followers-tab").text(`Followers (${followersCount})`);
+            $("#following-tab").text(`Following (${followingCount})`);
+        }
+
+        function updateButtonState(button, action) {
+            if (action === "unfollow") {
+                button.text("Follow");
+                button.data("action", "follow");
+                button.removeClass("btn-outline-danger").addClass("btn-outline-success");
+            } else {
+                button.text("Unfollow");
+                button.data("action", "unfollow");
+                button.removeClass("btn-outline-success").addClass("btn-outline-danger");
+            }
+        }
+
+        $(".follow-toggle").click(function(e) {
+            e.preventDefault();
+            var button = $(this);
+            var action = button.data("action");
+            var profileId = button.data("profile-id");
+
+            // Optimistically update UI
+            updateButtonState(button, action);
+            var currentFollowers = parseInt($("#followers-tab").text().match(/\d+/)[0]);
+            var currentFollowing = parseInt($("#following-tab").text().match(/\d+/)[0]);
+
+            if (currentProfileId == profileId) {
+                // We're on the target profile's page
+                updateFollowCounts(action === "follow" ? currentFollowers + 1 : currentFollowers - 1, currentFollowing);
+            } else if (currentProfileId == loggedInUserId) {
+                // We're on the logged-in user's profile page
+                updateFollowCounts(currentFollowers, action === "follow" ? currentFollowing + 1 : currentFollowing - 1);
+            }
+
+            $.ajax({
+                type: "POST",
+                url: `/user/profile/${profileId}/`,
+                data: {
+                    follow: action,
+                    profile_id: profileId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    // Update counts with actual values from server
+                    if (currentProfileId == profileId) {
+                        updateFollowCounts(response.target_followers_count, response.target_following_count);
+                    } else if (currentProfileId == loggedInUserId) {
+                        updateFollowCounts(response.current_user_followers_count, response.current_user_following_count);
+                    }
+                    
+                    // Update all buttons for this profile
+                    $(`.follow-toggle[data-profile-id="${profileId}"]`).each(function() {
+                        updateButtonState($(this), action);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", status, error);
+                    // Revert optimistic updates on error
+                    updateButtonState(button, action === "follow" ? "unfollow" : "follow");
+                    if (currentProfileId == profileId) {
+                        updateFollowCounts(action === "follow" ? currentFollowers - 1 : currentFollowers + 1, currentFollowing);
+                    } else if (currentProfileId == loggedInUserId) {
+                        updateFollowCounts(currentFollowers, action === "follow" ? currentFollowing - 1 : currentFollowing + 1);
+                    }
+                },
+            });
+        });
+    });
+    </script>
+{% endblock %}
