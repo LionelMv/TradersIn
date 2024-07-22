@@ -10,7 +10,7 @@
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <h5 class="card-title">{{ profile.user.username }}</h5>
+                    <h5 class="card-title">{{ profile.user.first_name }}</h5>
                     <h6 class="card-subtitle mb-2 text-body-secondary">@{{ profile.user.username|lower }}</h6>
                     <p class="card-text">{{ profile.user.profile.bio }}</p>
                     <br>
@@ -65,6 +65,12 @@
                         </div>
                     </div>
                 {% endfor %}
+            {% else %}
+                {% if profile.user == request.user %}
+                    <p>No posts yet. Create one <a href="{% url 'blog:post_create' %}">here</a></p>
+                {% else %}
+                    <p>No posts yet</p>
+                {% endif %}
             {% endif %}
         </div>
         <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab">
