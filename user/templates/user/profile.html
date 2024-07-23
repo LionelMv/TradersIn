@@ -111,11 +111,13 @@
                             <p class="mb-1 text-muted">{{ follower.bio }}</p>
                         </div>
                     </a>
-                        <button class="btn btn-sm follow-toggle {% if follower.user.profile in request.user.profile.follows.all %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
-                                data-action="{% if follower.user.profile in request.user.profile.follows.all %}unfollow{% else %}follow{% endif %}" 
-                                data-profile-id="{{ follower.user.id }}">
-                            {% if follower.user.profile in request.user.profile.follows.all %}Unfollow{% else %}Follow{% endif %}
-                        </button>
+                    {% if follower.user != request.user %}
+                        {% if follower in request.user.profile.follows.all %}
+                            <a class="btn btn-sm btn-outline-danger" href="{% url 'user:unfollow_user' follower.user.id %}">Unfollow</a>
+                        {% else %}
+                            <a class="btn btn-sm btn-outline-success" href="{% url 'user:follow_user' follower.user.id %}">Follow</a>
+                        {% endif %}
+                    {% endif %}
                 </div>
             {% endfor %}
             </div>
@@ -132,11 +134,11 @@
                             </div>
                         </a>
                         {% if following.user != request.user %}
-                            <button class="btn btn-sm follow-toggle {% if following.user.profile in request.user.profile.follows.all %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
-                           data-action="{% if following.user.profile in request.user.profile.follows.all %}unfollow{% else %}follow{% endif %}" 
-                           data-profile-id="{{ following.user.id }}">
-                                {% if following.user.profile in request.user.profile.follows.all %}Unfollow{% else %}Follow{% endif %}
-                            </button>
+                            {% if following in request.user.profile.follows.all %}
+                                <a class="btn btn-sm btn-outline-danger" href="{% url 'user:unfollow_user' following.user.id %}">Unfollow</a>
+                            {% else %}
+                                <a class="btn btn-sm btn-outline-success" href="{% url 'user:follow_user' following.user.id %}">Follow</a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 {% endfor %}
