@@ -75,27 +75,16 @@ def profile(request, pk):
     profile = get_object_or_404(Profile, user_id=pk)
 
     if request.method == "POST":
+        # Get logged in user profile
         current_user_profile = request.user.profile
         action = request.POST.get("follow")
-        target_profile_id = request.POST.get("profile_id", pk)
-        target_profile = get_object_or_404(Profile, user_id=target_profile_id)
-
-        if action == "unfollow":
-            current_user_profile.follows.remove(target_profile)
-            status = "unfollowed"
+        if action == "follow":
+            current_user_profile.follows.add(profile)
         else:
-            current_user_profile.follows.add(target_profile)
-            status = "followed"
-
+            current_user_profile.follows.remove(profile)
+        
+        # Save the profile
         current_user_profile.save()
-
-        return JsonResponse({
-            "status": status,
-            "target_followers_count": target_profile.followed_by.count(),
-            "target_following_count": target_profile.follows.count(),
-            "current_user_followers_count": current_user_profile.followed_by.count(),
-            "current_user_following_count": current_user_profile.follows.count()
-        })
 
     posts = Post.objects.filter(author_id=pk).order_by("-date_posted")
     context = {
