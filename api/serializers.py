@@ -8,6 +8,12 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
+        read_only_fields = ['author', 'date_posted', 'likes']
+
+    def update(self, instance, validated_data):
+        """Remove likes in POST request"""
+        validated_data.pop('likes', None)
+        return super().update(instance, validated_data)
 
 
 class UserSerializer(serializers.ModelSerializer):
