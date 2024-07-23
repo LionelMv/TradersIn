@@ -7,5 +7,7 @@ blog/migrations/__pycache__
 blog/templatetags/__pycache__
 user/__pycache__
 user/migrations/__pycache__
+api/__pycache__
+api/migrations/__pycache__
 media/profile_pics
 lorem.html
