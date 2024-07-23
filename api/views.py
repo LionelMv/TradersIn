@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions
+from .permissions import IsAuthorOrReadOnly
 from blog.models import Post
 from user.models import User
 from .serializers import PostSerializer, UserSerializer
@@ -18,7 +19,7 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     """Json representation of a single post"""
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
 
 
 class UserList(generics.ListCreateAPIView):
