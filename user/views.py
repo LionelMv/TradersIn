@@ -2,8 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
-from django.views.decorators.csrf import ensure_csrf_cookie
 from functools import wraps
 from .forms import SignUpForm, UserUpdateForm, ProfileUpdateForm
 from .models import Profile
@@ -69,7 +67,6 @@ def logout_user(request):
 
 
 @login_required
-@ensure_csrf_cookie
 def profile(request, pk):
     """Profile page."""
     profile = get_object_or_404(Profile, user_id=pk)
@@ -82,7 +79,7 @@ def profile(request, pk):
             current_user_profile.follows.add(profile)
         else:
             current_user_profile.follows.remove(profile)
-        
+
         # Save the profile
         current_user_profile.save()
 
@@ -95,6 +92,21 @@ def profile(request, pk):
         "following_count": profile.follows.count()
     }
     return render(request, "user/profile.html", context)
+
+
+@login_required
+def toggle_follow_user(request, pk, action):
+    """Follow or unfollow a user based on the action parameter."""
+    profile = get_object_or_404(Profile, user_id=pk)
+    current_user_profile = request.user.profile
+
+    if action == 'follow':
+        current_user_profile.follows.add(profile)
+    elif action == 'unfollow':
+        current_user_profile.follows.remove(profile)
+
+    current_user_profile.save()
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
