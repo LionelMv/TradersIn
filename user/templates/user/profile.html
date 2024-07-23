@@ -31,13 +31,15 @@
                     {% if profile.user == request.user %}
                         <a href="{% url 'user:update_user' %}" class="btn btn-outline-primary">Edit Profile</a>
                     {% endif %}
-                    <br><br>
                     {% if profile.user != request.user %}
-                        <button class="btn follow-toggle card-follow-btn {% if profile in request.user.profile.follows.all %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
-    data-action="{% if profile in request.user.profile.follows.all %}unfollow{% else %}follow{% endif %}" 
-    data-profile-id="{{ profile.user.id }}">
-                            {% if profile in request.user.profile.follows.all %}Unfollow{% else %}Follow{% endif %}
-                        </button>
+                        <form method=POST>
+                            {% csrf_token %}
+                            {% if profile in request.user.profile.follows.all %}
+                                <button class="btn btn-sm btn-outline-danger" name="follow" value="unfollow" type="submit">Unfollow @{{ profile.user.username|lower }}</button>
+                            {% else %}
+                                <button class="btn btn-sm btn-outline-success" name="follow" value="follow" type="submit">Follow @{{ profile.user.username|lower }}</button>
+                            {% endif %}
+                        </form>
                     {% endif %}
                 </div>
             </div>
@@ -109,13 +111,11 @@
                             <p class="mb-1 text-muted">{{ follower.bio }}</p>
                         </div>
                     </a>
-                    {% if follower.user != request.user %}
                         <button class="btn btn-sm follow-toggle {% if follower.user.profile in request.user.profile.follows.all %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
                                 data-action="{% if follower.user.profile in request.user.profile.follows.all %}unfollow{% else %}follow{% endif %}" 
                                 data-profile-id="{{ follower.user.id }}">
                             {% if follower.user.profile in request.user.profile.follows.all %}Unfollow{% else %}Follow{% endif %}
                         </button>
-                    {% endif %}
                 </div>
             {% endfor %}
             </div>
@@ -144,82 +144,4 @@
         </div>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    $(document).ready(function() {
-        var currentProfileId = $(".container").data("current-profile-id");
-        var loggedInUserId = $(".container").data("logged-in-user-id");
-
-        function updateFollowCounts(followersCount, followingCount) {
-            $("#followers-tab").text(`Followers (${followersCount})`);
-            $("#following-tab").text(`Following (${followingCount})`);
-        }
-
-        function updateButtonState(button, action) {
-            if (action === "unfollow") {
-                button.text("Follow");
-                button.data("action", "follow");
-                button.removeClass("btn-outline-danger").addClass("btn-outline-success");
-            } else {
-                button.text("Unfollow");
-                button.data("action", "unfollow");
-                button.removeClass("btn-outline-success").addClass("btn-outline-danger");
-            }
-        }
-
-        $(".follow-toggle").click(function(e) {
-            e.preventDefault();
-            var button = $(this);
-            var action = button.data("action");
-            var profileId = button.data("profile-id");
-
-            // Optimistically update UI
-            updateButtonState(button, action);
-            var currentFollowers = parseInt($("#followers-tab").text().match(/\d+/)[0]);
-            var currentFollowing = parseInt($("#following-tab").text().match(/\d+/)[0]);
-
-            if (currentProfileId == profileId) {
-                // We're on the target profile's page
-                updateFollowCounts(action === "follow" ? currentFollowers + 1 : currentFollowers - 1, currentFollowing);
-            } else if (currentProfileId == loggedInUserId) {
-                // We're on the logged-in user's profile page
-                updateFollowCounts(currentFollowers, action === "follow" ? currentFollowing + 1 : currentFollowing - 1);
-            }
-
-            $.ajax({
-                type: "POST",
-                url: `/user/profile/${profileId}/`,
-                data: {
-                    follow: action,
-                    profile_id: profileId,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function(response) {
-                    // Update counts with actual values from server
-                    if (currentProfileId == profileId) {
-                        updateFollowCounts(response.target_followers_count, response.target_following_count);
-                    } else if (currentProfileId == loggedInUserId) {
-                        updateFollowCounts(response.current_user_followers_count, response.current_user_following_count);
-                    }
-                    
-                    // Update all buttons for this profile
-                    $(`.follow-toggle[data-profile-id="${profileId}"]`).each(function() {
-                        updateButtonState($(this), action);
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX Error:", status, error);
-                    // Revert optimistic updates on error
-                    updateButtonState(button, action === "follow" ? "unfollow" : "follow");
-                    if (currentProfileId == profileId) {
-                        updateFollowCounts(action === "follow" ? currentFollowers - 1 : currentFollowers + 1, currentFollowing);
-                    } else if (currentProfileId == loggedInUserId) {
-                        updateFollowCounts(currentFollowers, action === "follow" ? currentFollowing - 1 : currentFollowing + 1);
-                    }
-                },
-            });
-        });
-    });
-    </script>
 {% endblock %}
