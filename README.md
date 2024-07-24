@@ -61,5 +61,14 @@ On your browser, run the following link: http://127.0.0.1:8000/ or http://localh
 ## API Documentation
 The documentation of the API created using Django Rest Framework (DRF) is on the file ```api.md```.
 
+## Contributing
+Want to make TradersIn better?
+- Fork the project.
+- Create a new branch to work on ```git checkout -b <feature_branch>```
+- You can name the branch with the prefix ```feature_```
+- Add your changes and push them to the branch: ```git push```
+- Open a pull request
+
+
 ## Authors
 Lionel Gicheru [LinkedIn](https://www.linkedin.com/in/lionelmwangi/)
