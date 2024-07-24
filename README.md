@@ -57,5 +57,9 @@ python manage.py runserver
 
 On your browser, run the following link: http://127.0.0.1:8000/ or http://localhost:8000/.
 
+
+## API Documentation
+The documentation of the API created using Django Rest Framework (DRF) is on the file ```api.md```.
+
 ## Authors
 Lionel Gicheru [LinkedIn](https://www.linkedin.com/in/lionelmwangi/)
