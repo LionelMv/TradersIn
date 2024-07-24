@@ -3,8 +3,12 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from .permissions import IsAuthorOrReadOnly, IsAdminOrSelf
 from blog.models import Post
-from user.models import User
-from .serializers import PostSerializer, UserSerializer
+from user.models import User, Profile
+from .serializers import (
+    PostSerializer,
+    UserSerializer,
+    ProfileSerializer
+)
 
 
 class PostList(generics.ListCreateAPIView):
@@ -44,3 +48,56 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
             {'detail': 'Method "DELETE" not allowed.'},
             status=status.HTTP_403_FORBIDDEN
             )
+
+
+class ProfileList(generics.ListCreateAPIView):
+    """Json representation of all profiles"""
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrSelf]
+
+
+class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+    """Json representation of a single profile"""
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrSelf]
+
+
+class ProfileFollowers(generics.ListAPIView):
+    """Json representation of a profile's followers"""
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrSelf]
+
+    def get_queryset(self):
+        profile_id = self.kwargs['pk']
+        try:
+            profile = Profile.objects.get(pk=profile_id)
+        except Profile.DoesNotExist:
+            return User.objects.none()
+        return profile.followed_by.all()
+
+
+class ProfileFollowing(generics.ListAPIView):
+    """Json representation of a profile's following"""
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrSelf]
+
+    def get_queryset(self):
+        profile_id = self.kwargs['pk']
+        try:
+            profile = Profile.objects.get(pk=profile_id)
+        except Profile.DoesNotExist:
+            return User.objects.none()
+        return profile.follows.all()
+
+
+# class ProfileFollowing(generics.ListAPIView):
+#     """Json representation of a profile's following"""
+#     serializer_class = UserSerializer
+#     permission_classes = [permissions.IsAuthenticated, IsAdminOrSelf]
+
+#     def get_queryset(self):
+#         profile = self.kwargs['pk']
+#         print(User.objects)
+#         return User.objects.filter(profile__follows__id=profile)
